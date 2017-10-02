@@ -1,11 +1,15 @@
 package com.github.spartusch.hfdemo.service;
 
+import rx.Single;
+
 public interface DemoService {
 
-    String getDataUsingDefaultFeignClient();
+    String getData();
 
-    String getDataUsingDefaultFeignClientWithFallback();
+    String getDataWithFallback();
 
-    String getDataUsingDecode404FeignClient();
+    String getDataWithErrorDecoder();
+
+    Single<String> getRxData();
 
 }
