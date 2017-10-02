@@ -1,9 +1,9 @@
 package com.github.spartusch.hfdemo.service;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.github.spartusch.hfdemo.clients.Decode404FeignClient;
 import com.github.spartusch.hfdemo.clients.ErrorDecoderFeignClient;
 import com.github.spartusch.hfdemo.clients.FallbackFeignClient;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Single;
@@ -11,8 +11,8 @@ import rx.Single;
 @Service
 public class DemoServiceImpl implements DemoService {
 
-    private FallbackFeignClient fallbackFeignClient;
     private Decode404FeignClient decode404FeignClient;
+    private FallbackFeignClient fallbackFeignClient;
     private ErrorDecoderFeignClient errorDecoderFeignClient;
 
     @Autowired

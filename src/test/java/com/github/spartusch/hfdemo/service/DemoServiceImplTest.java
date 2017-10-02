@@ -1,10 +1,10 @@
 package com.github.spartusch.hfdemo.service;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.netflix.hystrix.exception.HystrixRuntimeException;
 import com.github.spartusch.hfdemo.TestApplication;
 import com.github.spartusch.hfdemo.exception.BusinessRuntimeException;
 import com.github.spartusch.hfdemo.exception.TechnicalRuntimeException;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.netflix.hystrix.exception.HystrixRuntimeException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import rx.observers.TestSubscriber;
 
+import static com.github.spartusch.hfdemo.service.DemoServiceImplTest.HYSTRIX_PERCENTAGE;
+import static com.github.spartusch.hfdemo.service.DemoServiceImplTest.HYSTRIX_ROLLINGWINDOW;
+import static com.github.spartusch.hfdemo.service.DemoServiceImplTest.HYSTRIX_THRESHOLD;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static de.interhyp.spartusch.hfdemo.service.DemoServiceImplTest.HYSTRIX_PERCENTAGE;
-import static de.interhyp.spartusch.hfdemo.service.DemoServiceImplTest.HYSTRIX_ROLLINGWINDOW;
-import static de.interhyp.spartusch.hfdemo.service.DemoServiceImplTest.HYSTRIX_THRESHOLD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6Assertions.catchThrowable;
 

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
         name = "defaultFeignClient",
         url = "${clients.url}"
 )
-public interface DefaultFeignClient {
+public interface ErrorDecoderFeignClient {
 
     @RequestMapping(method = RequestMethod.GET)
     String getData();
