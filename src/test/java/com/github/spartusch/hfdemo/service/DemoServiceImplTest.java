@@ -2,7 +2,6 @@ package com.github.spartusch.hfdemo.service;
 
 import com.github.spartusch.hfdemo.TestApplication;
 import com.github.spartusch.hfdemo.exception.BusinessRuntimeException;
-import com.github.spartusch.hfdemo.exception.TechnicalRuntimeException;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 import org.junit.Test;
@@ -45,16 +44,14 @@ public class DemoServiceImplTest {
     @Autowired
     private DemoService demoService;
 
-    private HttpStatus stubResponse(final HttpStatus httpStatus) {
+    private void stubResponse(final HttpStatus httpStatus) {
         WireMock.reset();
         stubFor(get(urlEqualTo("/")).willReturn(aResponse()
                 .withStatus(httpStatus.value())
                 .withBody(httpStatus.getReasonPhrase())));
-        return httpStatus;
     }
 
-    private void triggerHystrixCircuitOpen(final HttpStatus errorStatus, final Runnable runnable) {
-        stubResponse(errorStatus);
+    private void runRepeatedly(final Runnable runnable) {
         final int numberOfErrorRequests = HYSTRIX_THRESHOLD + 1;
         for (int i = numberOfErrorRequests; i > 0; i--) {
             try {
@@ -67,11 +64,12 @@ public class DemoServiceImplTest {
     }
 
     @Test
-    public void test_NoFallback() {
-        final HttpStatus httpStatus = stubResponse(HttpStatus.OK);
-        assertThat(demoService.getData()).isEqualTo(httpStatus.getReasonPhrase());
+    public void test_getData() {
+        stubResponse(HttpStatus.OK);
+        assertThat(demoService.getData()).isEqualTo(HttpStatus.OK.getReasonPhrase());
 
-        triggerHystrixCircuitOpen(HttpStatus.NOT_MODIFIED, () -> {
+        stubResponse(HttpStatus.NOT_FOUND);
+        runRepeatedly(() -> {
             final Throwable e = catchThrowable(() -> demoService.getData());
             assertThat(e).isInstanceOf(HystrixRuntimeException.class);
         });
@@ -82,11 +80,26 @@ public class DemoServiceImplTest {
     }
 
     @Test
-    public void test_WithFallback() {
-        final HttpStatus httpStatus = stubResponse(HttpStatus.OK);
-        assertThat(demoService.getDataWithFallback()).isEqualTo(httpStatus.getReasonPhrase());
+    public void test_getDataWithDecode404() {
+        stubResponse(HttpStatus.OK);
+        assertThat(demoService.getDataWithDecode404()).isEqualTo(HttpStatus.OK.getReasonPhrase());
 
-        triggerHystrixCircuitOpen(HttpStatus.NOT_MODIFIED, () -> {
+        stubResponse(HttpStatus.NOT_FOUND);
+        runRepeatedly(() -> {
+            assertThat(demoService.getDataWithDecode404()).isEqualTo(HttpStatus.NOT_FOUND.getReasonPhrase());
+        });
+
+        stubResponse(HttpStatus.OK);
+        assertThat(demoService.getDataWithDecode404()).isEqualTo(HttpStatus.OK.getReasonPhrase());
+    }
+
+    @Test
+    public void test_getDataWithFallback() {
+        stubResponse(HttpStatus.OK);
+        assertThat(demoService.getDataWithFallback()).isEqualTo(HttpStatus.OK.getReasonPhrase());
+
+        stubResponse(HttpStatus.NOT_MODIFIED);
+        runRepeatedly(() -> {
             assertThat(demoService.getDataWithFallback()).isEqualTo("fallback");
         });
 
@@ -95,39 +108,57 @@ public class DemoServiceImplTest {
     }
 
     @Test
-    public void test_WithErrorDecoder() {
-        HttpStatus httpStatus = stubResponse(HttpStatus.OK);
-        assertThat(demoService.getDataWithErrorDecoder()).isEqualTo(httpStatus.getReasonPhrase());
+    public void test_getDataWithErrorDecoder_BusinessRuntimeException() {
+        stubResponse(HttpStatus.OK);
+        assertThat(demoService.getDataWithErrorDecoder()).isEqualTo(HttpStatus.OK.getReasonPhrase());
 
-        triggerHystrixCircuitOpen(HttpStatus.NOT_MODIFIED, () -> {
+        stubResponse(HttpStatus.NOT_MODIFIED);
+        runRepeatedly(() -> {
             final Throwable e = catchThrowable(() -> demoService.getDataWithErrorDecoder());
-            assertThat(e).isInstanceOfAny(BusinessRuntimeException.class, TechnicalRuntimeException.class);
+            assertThat(e).isInstanceOf(BusinessRuntimeException.class);
         });
 
-        httpStatus = stubResponse(HttpStatus.OK);
+        stubResponse(HttpStatus.OK);
         final String response = demoService.getDataWithErrorDecoder();
-        assertThat(response).isEqualTo(httpStatus.getReasonPhrase());
+        assertThat(response).isEqualTo(HttpStatus.OK.getReasonPhrase());
     }
 
     @Test
-    public void test_WithRx() {
-        final HttpStatus httpStatus = stubResponse(HttpStatus.OK);
+    public void test_getDataWithErrorDecoder_TechnicalRuntimeException() {
+        stubResponse(HttpStatus.OK);
+        assertThat(demoService.getDataWithErrorDecoder()).isEqualTo(HttpStatus.OK.getReasonPhrase());
+
+        stubResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+        runRepeatedly(() -> {
+            final Throwable e = catchThrowable(() -> demoService.getDataWithErrorDecoder());
+            assertThat(e).isInstanceOf(HystrixRuntimeException.class);
+        });
+
+        stubResponse(HttpStatus.OK);
+        final Throwable e = catchThrowable(() -> demoService.getDataWithErrorDecoder());
+        assertThat(e).isInstanceOf(HystrixRuntimeException.class);
+    }
+
+    @Test
+    public void test_getDataWithRx() {
+        stubResponse(HttpStatus.OK);
         final TestSubscriber<String> subscriberSucc  = new TestSubscriber<>();
-        demoService.getRxData().subscribe(subscriberSucc);
+        demoService.getDataWithRx().subscribe(subscriberSucc);
         subscriberSucc.awaitTerminalEvent();
         subscriberSucc.assertNoErrors();
-        subscriberSucc.assertValue(httpStatus.getReasonPhrase());
+        subscriberSucc.assertValue(HttpStatus.OK.getReasonPhrase());
 
-        triggerHystrixCircuitOpen(HttpStatus.NOT_MODIFIED, () -> {
+        stubResponse(HttpStatus.NOT_MODIFIED);
+        runRepeatedly(() -> {
             final TestSubscriber<String> subscriber = new TestSubscriber<>();
-            demoService.getRxData().subscribe(subscriber);
+            demoService.getDataWithRx().subscribe(subscriber);
             subscriber.awaitTerminalEvent();
             subscriber.assertError(HystrixRuntimeException.class);
         });
 
         stubResponse(HttpStatus.OK);
         final TestSubscriber<String> subscriberErr  = new TestSubscriber<>();
-        demoService.getRxData().subscribe(subscriberErr);
+        demoService.getDataWithRx().subscribe(subscriberErr);
         subscriberErr.awaitTerminalEvent();
         subscriberErr.assertError(HystrixRuntimeException.class);
     }
