@@ -1,9 +1,9 @@
 package com.github.spartusch.hfdemo.service;
 
+import com.github.spartusch.hfdemo.clients.AlternateDefaultFeignClient;
 import com.github.spartusch.hfdemo.clients.Decode404FeignClient;
 import com.github.spartusch.hfdemo.clients.DefaultFeignClient;
 import com.github.spartusch.hfdemo.clients.ErrorDecoderFeignClient;
-import com.github.spartusch.hfdemo.clients.AlternateDefaultFeignClient;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
