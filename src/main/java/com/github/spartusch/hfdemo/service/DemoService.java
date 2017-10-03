@@ -6,10 +6,12 @@ public interface DemoService {
 
     String getData();
 
+    String getDataWithDecode404();
+
     String getDataWithFallback();
 
     String getDataWithErrorDecoder();
 
-    Single<String> getRxData();
+    Single<String> getDataWithRx();
 
 }
