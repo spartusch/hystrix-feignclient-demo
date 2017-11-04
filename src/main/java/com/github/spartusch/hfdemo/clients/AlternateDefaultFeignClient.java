@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 /**
  * An alternate feign client with default configuration.
  * This client has its own Hystrix state, independent from {@link DefaultFeignClient}'s state.
+ *
+ * @author Stefan Partusch
  */
 @FeignClient(
         name = "alternateDefaultFeignClient",

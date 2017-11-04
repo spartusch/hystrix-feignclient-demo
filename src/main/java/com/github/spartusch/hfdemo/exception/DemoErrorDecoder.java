@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
  * behaviour. This error decoder provides {@link BusinessRuntimeException}s for status codes < 500 in order
  * to avoid Hystrix fallback/error behaviour in these cases. It provides {@link TechnicalRuntimeException}s for
  * status codes in the 5xx range and thus triggers Hystrix fallback/error behaviour in these cases.
+ *
+ * @author Stefan Partusch
  */
 public class DemoErrorDecoder implements ErrorDecoder {
 

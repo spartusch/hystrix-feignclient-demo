@@ -9,6 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Single;
 
+/**
+ * Implementation of {@link DemoService}.
+ *
+ * @author Stefan Partusch
+ */
 @Service
 public class DemoServiceImpl implements DemoService {
 

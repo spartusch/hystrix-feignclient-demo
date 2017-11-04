@@ -24,7 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6Assertions.catchThrowable;
 
 /**
- * These tests are show-cases of the interaction of feign clients with Hystrix.
+ * These tests are examples demonstrating feign clients with Hystrix enabled.
+ *
+ * @author Stefan Partusch
  */
 @SpringBootTest(classes = TestApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,

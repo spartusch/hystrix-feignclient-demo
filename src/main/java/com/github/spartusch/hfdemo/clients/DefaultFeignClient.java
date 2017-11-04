@@ -7,6 +7,8 @@ import rx.Single;
 
 /**
  * A feign client with default configuration.
+ *
+ * @author Stefan Partusch
  */
 @FeignClient(
         name = "defaultFeignClient",

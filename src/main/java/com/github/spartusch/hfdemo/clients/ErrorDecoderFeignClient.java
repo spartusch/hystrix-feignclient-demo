@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * A feign client configured to use {@link DemoErrorDecoder}.
+ *
+ * @author Stefan Partusch
  */
 @FeignClient(
         name = "errorDecoderFeignClient",

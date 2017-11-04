@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * A feign client with decoding for HTTP status code 404 enabled.
+ *
+ * @author Stefan Partusch
  */
 @FeignClient(
         name = "decode404FeignClient",

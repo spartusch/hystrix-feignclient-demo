@@ -9,6 +9,8 @@ import rx.Single;
 /**
  * A simple service to demonstrate usage of the available feign clients.
  * The only implementation is {@link DemoServiceImpl}.
+ *
+ * @author Stefan Partusch
  */
 public interface DemoService {
 
